@@ -1,0 +1,54 @@
+services:
+
+  endpoint:
+    image: endpoint
+    build:
+      context: .
+      dockerfile: Dockerfile-endpoint
+    environment:
+      - DATASOURCE_URL=${DATASOURCE_URL}
+      - DATASOURCE_USERNAME=${DATASOURCE_USERNAME:-postgres}
+      - DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    ports:
+      - "8080:8080"
+
+  extractor:
+    image: extractor
+    build:
+      context: .
+      dockerfile: Dockerfile-extractor
+    environment:
+      - DATASOURCE_URL=${DATASOURCE_URL}
+      - DATASOURCE_USERNAME=${DATASOURCE_USERNAME:-postgres}
+      - DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+
+  db:
+    container_name: db
+    hostname: db
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATASOURCE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+  #    ports:
+  #      - '5432:5432'
+  #    volumes:
+  #      - postgresql_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:3-management-alpine
+    restart: always
+#    ports:
+#      - "5672:5672"    # RabbitMQ main port (AMQP)
+#      - "15672:15672"  # RabbitMQ management GUI
+#    volumes:
+#      - rabbitmq_data:/var/lib/rabbitmq
+
+#volumes:
+#  postgresql_data:
+#  rabbitmq_data:

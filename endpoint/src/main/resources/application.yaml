@@ -1,0 +1,25 @@
+application:
+  name: endpoint
+spring:
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+  jpa:
+    hibernate:
+      ddl-auto: 'update'
+stransky:
+  redcare:
+    queue:
+      name: 'redcare_github_repository_jobs'
+    search:
+      chunkSize: 1
+      chunkSizeUnit: DAYS
+      durationInWhichForSureRepositoriesAreCreated: 1
+      durationInWhichForSureRepositoriesAreCreatedUnit: HOURS
+    weights:
+      starFactor: ${WEIGHTS_STAR:3}
+      forkFactor: ${WEIGHTS_FORK:5}
+      ageFactor: ${WEIGHTS_DAYS:-0.8}

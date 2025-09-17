@@ -1,0 +1,16 @@
+application:
+  name: extractor
+spring:
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+  jpa:
+    hibernate:
+      ddl-auto: 'update'
+stransky:
+  redcare:
+    queue:
+      name: 'redcare_github_repository_jobs'

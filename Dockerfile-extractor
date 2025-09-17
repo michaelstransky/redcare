@@ -1,0 +1,18 @@
+FROM maven:3.9.11-eclipse-temurin-21-alpine AS maven_tool_chain_interfaces
+COPY interfaces/pom.xml /usr/src/app/interfaces/
+WORKDIR /usr/src/app/interfaces/
+COPY interfaces/src /usr/src/app/interfaces/src/
+RUN mvn install
+
+FROM maven_tool_chain_interfaces AS maven_tool_chain
+COPY extractor/pom.xml /usr/src/app/
+WORKDIR /usr/src/app/
+RUN mvn compile
+# stable base image to reduce duplicate downloads
+COPY extractor/src /usr/src/app/src/
+RUN mvn package
+
+FROM eclipse-temurin:21-alpine
+RUN mkdir /opt/app
+COPY --from=maven_tool_chain /usr/src/app/target/extractor*.jar /opt/app/extractor.jar
+CMD ["java", "-jar", "/opt/app/extractor.jar"]

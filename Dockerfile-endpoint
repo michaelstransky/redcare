@@ -1,0 +1,19 @@
+FROM maven:3.9.11-eclipse-temurin-21-alpine AS maven_tool_chain_interfaces
+COPY interfaces/pom.xml /usr/src/app/interfaces/
+WORKDIR /usr/src/app/interfaces/
+COPY interfaces/src /usr/src/app/interfaces/src/
+RUN mvn install
+
+FROM maven_tool_chain_interfaces AS maven_tool_chain
+COPY endpoint/pom.xml /usr/src/app/
+WORKDIR /usr/src/app/
+RUN mvn compile
+# stable base image to reduce duplicate downloads
+COPY endpoint/src /usr/src/app/src/
+RUN mvn package
+
+FROM eclipse-temurin:21-alpine
+RUN mkdir /opt/app
+COPY --from=MAVEN_TOOL_CHAIN /usr/src/app/target/endpoint*.jar /opt/app/endpoint.jar
+CMD ["java", "-jar", "/opt/app/endpoint.jar"]
+EXPOSE 8080
